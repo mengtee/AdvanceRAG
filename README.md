@@ -1,2 +1,2 @@
 # AdvanceRAG
-Vectara hackhathon
+Vectara hackathon
