@@ -1,4 +1,5 @@
 FROM python:3.11 as build
+FROM postgres:16
 
 WORKDIR /app
 
@@ -18,9 +19,4 @@ RUN apt update && apt install -y chromium chromium-driver
 COPY ./pyproject.toml ./poetry.lock* /app/
 RUN poetry install --no-root --no-cache --only main
 
-# ====================================
-FROM build as release
 
-COPY . .
-
-CMD ["python", "main.py"]

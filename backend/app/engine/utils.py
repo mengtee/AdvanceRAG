@@ -5,6 +5,7 @@ from app.engine.constants import PGVECTOR_SCHEMA, PGVECTOR_TABLE
 
 
 def init_pg_vector_store_from_env():
+    print("running init_pg_vector_store_from_env in utils)")
     original_conn_string = os.environ.get("PG_CONNECTION_STRING")
     if original_conn_string is None or original_conn_string == "":
         raise ValueError("PG_CONNECTION_STRING environment variable is not set.")
@@ -19,6 +20,7 @@ def init_pg_vector_store_from_env():
         original_scheme, "postgresql+asyncpg://"
     )
 
+    print("complete, complete, complete, complete")
     return PGVectorStore(
         connection_string=conn_string,
         async_connection_string=async_conn_string,

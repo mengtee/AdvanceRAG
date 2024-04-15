@@ -14,11 +14,12 @@ from app.settings import init_settings
 
 app = FastAPI()
 
+# calling init setting for initial set up (creating embeddings and llm)
 init_settings()
 
 environment = os.getenv("ENVIRONMENT", "dev")  # Default to 'development' if not set
 
-
+# Conditions setup for development environment
 if environment == "dev":
     logger = logging.getLogger("uvicorn")
     logger.warning("Running in development mode - allowing CORS for all origins")
@@ -35,10 +36,10 @@ if environment == "dev":
     async def redirect_to_docs():
         return RedirectResponse(url="/docs")
 
-
+# Including routers
 app.include_router(chat_router, prefix="/api/chat")
 
-
+# Main execution block
 if __name__ == "__main__":
     app_host = os.getenv("APP_HOST", "0.0.0.0")
     app_port = int(os.getenv("APP_PORT", "8000"))

@@ -58,6 +58,8 @@ class _Result(BaseModel):
 
 async def parse_chat_data(data: _ChatData) -> Tuple[str, List[ChatMessage]]:
     # check preconditions and get last message
+    print("Calling parse_chat_data from routers.chat.py")
+    print(data)
     if len(data.messages) == 0:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -77,6 +79,8 @@ async def parse_chat_data(data: _ChatData) -> Tuple[str, List[ChatMessage]]:
         )
         for m in data.messages
     ]
+    print("This is the message from the user")
+    print(last_message.content, messages)
     return last_message.content, messages
 
 
@@ -88,9 +92,10 @@ async def chat(
     chat_engine: BaseChatEngine = Depends(get_chat_engine),
 ):
     last_message_content, messages = await parse_chat_data(data)
-
+    print("Executing streaming end point, chat")
     response = await chat_engine.astream_chat(last_message_content, messages)
 
+    print("done running respose")
     async def event_generator():
         async for token in response.async_response_gen():
             if await request.is_disconnected():
@@ -100,16 +105,16 @@ async def chat(
     return StreamingResponse(event_generator(), media_type="text/plain")
 
 
-# non-streaming endpoint - delete if not needed
-@r.post("/request")
-async def chat_request(
-    data: _ChatData,
-    chat_engine: BaseChatEngine = Depends(get_chat_engine),
-) -> _Result:
-    last_message_content, messages = await parse_chat_data(data)
+# # non-streaming endpoint - delete if not needed /api/chat/request
+# @r.post("/request")
+# async def chat_request(
+#     data: _ChatData,
+#     chat_engine: BaseChatEngine = Depends(get_chat_engine),
+# ) -> _Result:
+#     last_message_content, messages = await parse_chat_data(data)
 
-    response = await chat_engine.achat(last_message_content, messages)
-    return _Result(
-        result=_Message(role=MessageRole.ASSISTANT, content=response.response),
-        nodes=_SourceNodes.from_source_nodes(response.source_nodes),
-    )
+#     response = await chat_engine.achat(last_message_content, messages)
+#     return _Result(
+#         result=_Message(role=MessageRole.ASSISTANT, content=response.response),
+#         nodes=_SourceNodes.from_source_nodes(response.source_nodes),
+#     )

@@ -1,19 +1,21 @@
 import os
 from typing import Dict
 from llama_index.core.settings import Settings
-from llama_index.llms.openai import OpenAI
-from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.llms.together import TogetherLLM
+from llama_index.embeddings.together import TogetherEmbedding
 
 
 def llm_config_from_env() -> Dict:
     from llama_index.core.constants import DEFAULT_TEMPERATURE
 
     model = os.getenv("MODEL")
+    TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
     temperature = os.getenv("LLM_TEMPERATURE", DEFAULT_TEMPERATURE)
     max_tokens = os.getenv("LLM_MAX_TOKENS")
 
     config = {
         "model": model,
+        "api_key": TOGETHER_API_KEY,
         "temperature": float(temperature),
         "max_tokens": int(max_tokens) if max_tokens is not None else None,
     }
@@ -22,20 +24,21 @@ def llm_config_from_env() -> Dict:
 
 def embedding_config_from_env() -> Dict:
     model = os.getenv("EMBEDDING_MODEL")
-    dimension = os.getenv("EMBEDDING_DIM")
+    TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 
     config = {
-        "model": model,
-        "dimension": int(dimension) if dimension is not None else None,
+        "model_name": model,
+        "api_key": TOGETHER_API_KEY,
     }
     return config
 
 
 def init_settings():
+    print("Running init_settings in the app.settings file ")
     llm_configs = llm_config_from_env()
     embedding_configs = embedding_config_from_env()
+    Settings.llm = TogetherLLM(**llm_configs)
 
-    Settings.llm = OpenAI(**llm_configs)
-    Settings.embed_model = OpenAIEmbedding(**embedding_configs)
-    Settings.chunk_size = int(os.getenv("CHUNK_SIZE", "1024"))
-    Settings.chunk_overlap = int(os.getenv("CHUNK_OVERLAP", "20"))
+    Settings.embed_model = TogetherEmbedding(**embedding_configs)
+    # Settings.chunk_size = int(os.getenv("CHUNK_SIZE", "1024"))
+    # Settings.chunk_overlap = int(os.getenv("CHUNK_OVERLAP", "20"))

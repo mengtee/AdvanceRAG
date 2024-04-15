@@ -1,4 +1,5 @@
 "use client";
+// this page is rendering inside client side as need to have interactive options such as type and file uploading
 
 import { useChat } from "ai/react";
 import { useMemo } from "react";

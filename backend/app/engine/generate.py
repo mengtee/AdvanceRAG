@@ -18,8 +18,13 @@ def generate_datasource():
     logger.info("Creating new index")
     # load the documents and create the index
     documents = get_documents()
+    print("successfully run get_document")
     store = init_pg_vector_store_from_env()
+    print("successfully run init_pg_vector_store_from_env")
     storage_context = StorageContext.from_defaults(vector_store=store)
+    print("successfully run storage_context")
+
+    # vector storing
     VectorStoreIndex.from_documents(
         documents,
         storage_context=storage_context,
@@ -28,6 +33,7 @@ def generate_datasource():
     logger.info(
         f"Successfully created embeddings in the PG vector store, schema={store.schema_name} table={store.table_name}"
     )
+
 
 
 if __name__ == "__main__":
