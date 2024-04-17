@@ -12,7 +12,8 @@ from llama_index.core.llms import ChatMessage, MessageRole
 from llama_index.llms.litellm import LiteLLM
 
 from app.engine import get_chat_engine
-from vectara.vectara_index import create_vectara_response
+from app.vectara.vectara_index import create_vectara_response
+#from app.vectara.vectara_index import filter_response
 
 chat_router = r = APIRouter()
 
@@ -102,16 +103,15 @@ async def chat(
     # print("Executing streaming end point, chat")
     # print(Settings.llm)
     # response = await chat_engine.astream_chat(last_message_content, messages)
-    response = create_vectara_response(last_message_content)
+    vectara_response = create_vectara_response(last_message_content)
 
-    print("done running respose")
-    async def event_generator():
-        async for token in response.async_response_gen():
-            if await request.is_disconnected():
-                break
-            yield token
+    #filtered_response = filter_response(vectara_response)  # Assume this function is defined to filter the response
+
+    print("done running response")
+    # async def event_generator():
+    #     yield filtered_response  
     # return StreamingResponse(event_generator(), media_type="text/plain")
-    return response
+    return vectara_response
 
 # @r.post("")
 # async def chat(
