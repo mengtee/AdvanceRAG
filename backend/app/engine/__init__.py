@@ -6,7 +6,6 @@ from llama_index.core.settings import Settings
 # )
 from llama_index.core.chat_engine import SimpleChatEngine
 from llama_index.core import ServiceContext
-from llama_index.llms.together import TogetherLLM
 
 
 # def get_chat_engine():
