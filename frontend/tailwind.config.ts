@@ -16,6 +16,7 @@ const config: Config = {
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
+        customHighlight: '#0ea5e9', // Custom highlight color
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
@@ -56,6 +57,9 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
+      },
+      height: {
+        '1/2screen': '50vh',  // Adding custom height utility
       },
       keyframes: {
         "accordion-down": {
