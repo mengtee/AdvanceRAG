@@ -5,8 +5,12 @@ from fastapi.responses import StreamingResponse
 from llama_index.core.chat_engine.types import (
     BaseChatEngine,
 )
+from llama_index.core.settings import Settings
+
 from llama_index.core.schema import NodeWithScore
 from llama_index.core.llms import ChatMessage, MessageRole
+from llama_index.llms.litellm import LiteLLM
+
 from app.engine import get_chat_engine
 from vectara.vectara_index import create_vectara_response
 
@@ -93,7 +97,10 @@ async def chat(
 ):
     #last message content is the input in string, messages is the message history
     last_message_content, messages = await parse_chat_data(data)
+
+    # response = await chat_engine.astream_chat(last_message_content, messages)
     # print("Executing streaming end point, chat")
+    # print(Settings.llm)
     # response = await chat_engine.astream_chat(last_message_content, messages)
     response = create_vectara_response(last_message_content)
 
