@@ -8,7 +8,8 @@ from llama_index.core.chat_engine.types import (
 from llama_index.core.schema import NodeWithScore
 from llama_index.core.llms import ChatMessage, MessageRole
 from app.engine import get_chat_engine
-from vectara.vectara_index import create_vectara_response
+from app.vectara.vectara_index import create_vectara_response
+from app.vectorstore.metric_vectorstore import retrive_vectara_input
 
 chat_router = r = APIRouter()
 
@@ -95,7 +96,9 @@ async def chat(
     last_message_content, messages = await parse_chat_data(data)
     # print("Executing streaming end point, chat")
     # response = await chat_engine.astream_chat(last_message_content, messages)
-    response = create_vectara_response(last_message_content)
+    
+    vectera_message = retrive_vectara_input(last_message_content)
+    response = create_vectara_response(vectera_message)
 
     print("done running respose")
     async def event_generator():
@@ -104,7 +107,7 @@ async def chat(
                 break
             yield token
     # return StreamingResponse(event_generator(), media_type="text/plain")
-    return response
+    return response.response
 
 # @r.post("")
 # async def chat(
