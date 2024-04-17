@@ -2,6 +2,9 @@ from llama_index.core.readers import SimpleDirectoryReader
 from llama_index.indices.managed.vectara import VectaraIndex  
 
 def create_vectara_response(input: str):
+
+    # documents = SimpleDirectoryReader(input_files=["/Users/summerthan/Desktop/currents/extras/AdvanceRAG/backend/data/BalanceSheet.pdf", "/Users/summerthan/Desktop/currents/extras/AdvanceRAG/backend/data/IncomeStatement.pdf"]).load_data()
+
     documents = SimpleDirectoryReader(input_files=["/Users/TEEMENGKIAT/Downloads/Income Statement_Annual_As Originally Reported.pdf"]).load_data()
     index = VectaraIndex.from_documents(documents)
 
