@@ -8,6 +8,7 @@ from llama_index.core.chat_engine.types import (
 from llama_index.core.schema import NodeWithScore
 from llama_index.core.llms import ChatMessage, MessageRole
 from app.engine import get_chat_engine
+from vectara.vectara_index import create_vectara_response
 
 chat_router = r = APIRouter()
 
@@ -89,11 +90,12 @@ async def parse_chat_data(data: _ChatData) -> Tuple[str, List[ChatMessage]]:
 async def chat(
     request: Request,
     data: _ChatData,
-    chat_engine: BaseChatEngine = Depends(get_chat_engine),
 ):
+    #last message content is the input in string, messages is the message history
     last_message_content, messages = await parse_chat_data(data)
-    print("Executing streaming end point, chat")
-    response = await chat_engine.astream_chat(last_message_content, messages)
+    # print("Executing streaming end point, chat")
+    # response = await chat_engine.astream_chat(last_message_content, messages)
+    response = create_vectara_response(last_message_content)
 
     print("done running respose")
     async def event_generator():
@@ -101,20 +103,25 @@ async def chat(
             if await request.is_disconnected():
                 break
             yield token
+    # return StreamingResponse(event_generator(), media_type="text/plain")
+    return response
 
-    return StreamingResponse(event_generator(), media_type="text/plain")
-
-
-# # non-streaming endpoint - delete if not needed /api/chat/request
-# @r.post("/request")
-# async def chat_request(
+# @r.post("")
+# async def chat(
+#     request: Request,
 #     data: _ChatData,
-#     chat_engine: BaseChatEngine = Depends(get_chat_engine),
-# ) -> _Result:
+#     #chat_engine: BaseChatEngine = Depends(get_chat_engine),
+# ):
 #     last_message_content, messages = await parse_chat_data(data)
+#     # print("Executing streaming end point, chat")
+#     response = await chat_engine.astream_chat(last_message_content, messages)
 
-#     response = await chat_engine.achat(last_message_content, messages)
-#     return _Result(
-#         result=_Message(role=MessageRole.ASSISTANT, content=response.response),
-#         nodes=_SourceNodes.from_source_nodes(response.source_nodes),
-#     )
+#     print("done running respose")
+#     async def event_generator():
+#         async for token in response.async_response_gen():
+#             if await request.is_disconnected():
+#                 break
+#             yield token
+
+#     return StreamingResponse(event_generator(), media_type="text/plain")
+
