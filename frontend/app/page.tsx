@@ -1,19 +1,24 @@
+import React from 'react';
 import Header from "@/app/components/header";
 import ChatSection from "./components/chat-section";
 import TeamIntroduction from "@/app/components/team-intro";
 import ProjectIntroduction from "@/app/components/proj-intro";
+import FileSelector from '@/app/components/FileSelector';  // Adjust the path as necessary
 
-// main chat page 
 export default function Home() {
+  const backendUrl = "http://localhost:8000";  // This should be the URL to your backend server
+
   return (
     <main className="flex min-h-screen flex-col items-center gap-10 p-24 background-gradient">
       <Header />
-      <ProjectIntroduction/>
+      <ProjectIntroduction />
+      <FileSelector backendUrl={backendUrl} />
       <ChatSection />
-      <TeamIntroduction/>
+      <TeamIntroduction />
     </main>
   );
 }
+
 
 // import Link from 'next/link';
 

@@ -5,12 +5,16 @@ load_dotenv()
 import logging
 import os
 import uvicorn
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+
+from typing import List
+from fastapi import FastAPI, HTTPException, APIRouter
 from fastapi.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from app.api.routers.chat import chat_router
 from app.settings import init_settings
-
+from app.vectara.vectara_index import index_file
+from app.api.routers.file import file_router
 
 app = FastAPI()
 
@@ -37,6 +41,7 @@ if environment == "dev":
         return RedirectResponse(url="/docs")
 
 # Including routers
+app.include_router(file_router)
 app.include_router(chat_router, prefix="/api/chat")
 
 # Main execution block

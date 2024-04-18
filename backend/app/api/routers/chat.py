@@ -6,6 +6,7 @@ from llama_index.core.chat_engine.types import (
     BaseChatEngine,
 )
 from llama_index.core.settings import Settings
+from fastapi.responses import JSONResponse
 
 from llama_index.core.schema import NodeWithScore
 from llama_index.core.llms import ChatMessage, MessageRole
@@ -13,6 +14,7 @@ from llama_index.llms.litellm import LiteLLM
 
 from app.engine import get_chat_engine
 from app.vectara.vectara_index import create_vectara_response
+import asyncio
 #from app.vectara.vectara_index import filter_response
 
 chat_router = r = APIRouter()
@@ -89,29 +91,33 @@ async def parse_chat_data(data: _ChatData) -> Tuple[str, List[ChatMessage]]:
     print(last_message.content, messages)
     return last_message.content, messages
 
-
-# streaming endpoint - delete if not needed
 @r.post("")
-async def chat(
-    request: Request,
-    data: _ChatData,
-):
-    #last message content is the input in string, messages is the message history
+async def chat(request: Request, data: _ChatData):
     last_message_content, messages = await parse_chat_data(data)
 
-    # response = await chat_engine.astream_chat(last_message_content, messages)
-    # print("Executing streaming end point, chat")
-    # print(Settings.llm)
-    # response = await chat_engine.astream_chat(last_message_content, messages)
-    vectara_response = create_vectara_response(last_message_content)
+    async def event_generator(query):
+        try:
+            response = create_vectara_response(query)
+            if isinstance(response, str):
+                # Split response into lines for streaming if it's a single string
+                for line in response.splitlines(keepends=True):  # keepends=True to keep newlines
+                    yield line
+                    await asyncio.sleep(0.1)  # Simulate delay for streaming effect
+            elif hasattr(response, '__iter__'):
+                # If response is an iterable, iterate and stream each item
+                for item in response:
+                    if isinstance(item, str):
+                        yield item + '\n'
+                    else:
+                        yield f"{item}\n"  # Convert item to string if not already
+                    await asyncio.sleep(0.1)
+            else:
+                # Directly yield the response if it is not string or iterable
+                yield str(response) + '\n'
+        except Exception as e:
+            yield f"Error generating response: {str(e)}\n"  # Provide error message
 
-    #filtered_response = filter_response(vectara_response)  # Assume this function is defined to filter the response
-
-    print("done running response")
-    # async def event_generator():
-    #     yield filtered_response  
-    # return StreamingResponse(event_generator(), media_type="text/plain")
-    return vectara_response
+    return StreamingResponse(event_generator(last_message_content), media_type="text/event-stream")
 
 # @r.post("")
 # async def chat(
