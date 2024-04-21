@@ -14,6 +14,7 @@ from llama_index.llms.litellm import LiteLLM
 
 from app.engine import get_chat_engine
 from app.vectara.vectara_index import create_vectara_response
+from app.agents.agent import create_agent
 import asyncio
 #from app.vectara.vectara_index import filter_response
 
@@ -98,6 +99,11 @@ async def chat(request: Request, data: _ChatData):
     async def event_generator(query):
         try:
             response = create_vectara_response(query)
+            
+            print("Testing, calling from def chat")
+            # print(vectara_response)
+            # response = create_agent(str(vectara_response))
+
             if isinstance(response, str):
                 # Split response into lines for streaming if it's a single string
                 for line in response.splitlines(keepends=True):  # keepends=True to keep newlines
@@ -116,6 +122,8 @@ async def chat(request: Request, data: _ChatData):
                 yield str(response) + '\n'
         except Exception as e:
             yield f"Error generating response: {str(e)}\n"  # Provide error message
+    
+
 
     return StreamingResponse(event_generator(last_message_content), media_type="text/event-stream")
 

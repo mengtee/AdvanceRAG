@@ -20,11 +20,9 @@ def create_vectara_response(input: str):
 
     print(file_path_global)
     documents = SimpleDirectoryReader(input_files=[file_path_global]).load_data()
-    index = VectaraIndex.from_documents(documents)
+    index = VectaraIndex.from_documents(documents, overwrite=True)
 
     response = index.as_query_engine().query(input)
-    print(response)
-
     return response
     # try:
     #     if file_path_global is None or not os.path.isfile(file_path_global):
