@@ -123,8 +123,6 @@ async def chat(request: Request, data: _ChatData):
         except Exception as e:
             yield f"Error generating response: {str(e)}\n"  # Provide error message
     
-
-
     return StreamingResponse(event_generator(last_message_content), media_type="text/event-stream")
 
 # @r.post("")
